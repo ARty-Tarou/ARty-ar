@@ -8,6 +8,7 @@
 import UIKit
 import SceneKit
 import ARKit
+import NCMB
 
 class ViewController: UIViewController, ARSCNViewDelegate, UITextFieldDelegate {
 
@@ -72,6 +73,21 @@ class ViewController: UIViewController, ARSCNViewDelegate, UITextFieldDelegate {
             
             //ローカルに保存
             guard((try? data.write(to: self.worldMapURL)) != nil)else{return}
+            
+            // TODO: ここにファイルストアに保存する処理を書く
+            // ファイルストアに保存
+            let file = NCMBFile(fileName: "WorldMap")
+            
+            file.saveInBackground(data: data, callback: {result in
+                switch result {
+                case .success:
+                    print("保存に成功")
+                case let .failure(error):
+                    print("保存に失敗:\(error)")
+                }
+            })
+            
+            
         }
     }
     
@@ -121,14 +137,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, UITextFieldDelegate {
             DispatchQueue.main.async{
                 let stamp = self.imageSelectButton.currentImage
                 
-                //スタンプのサイズを取得
-                let stampWidth = stamp?.size.width
-                let stampHeight = stamp?.size.height
-                
-                
-                //ボックスを作成
-                //let box = SCNBox(width: stampWidth! / 10000, height: 0.001, length: stampHeight! / 10000, chamferRadius: 0)
-                
                 // スタンプのサイズを設定
                 let intWidth = Int(self.widthTextField.text ?? "300")
                 let floatWidth: CGFloat = CGFloat(intWidth!)
@@ -173,6 +181,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UITextFieldDelegate {
         imagePickerController.delegate = self
         present(imagePickerController, animated: true, completion: nil)
     }
+    
  
     
     // MARK: UITextField
@@ -184,6 +193,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, UITextFieldDelegate {
         
         return true
     }
+    
+    
 }
 
 // MARK: UIImagePickerControllerDelegate+UINavigationControllerDelegate
